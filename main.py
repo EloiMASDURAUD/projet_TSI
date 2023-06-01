@@ -37,7 +37,7 @@ def main():
         
         tr = Transformation3D()
         #tr.translation.y = -np.amin(m.vertices, axis=0)[1]
-        tr.translation.x=1* random.randrange(-75, 75)
+        tr.translation. x=1* random.randrange(-75, 75)
         tr.translation.y = 1* random.randrange(1, 100)
         tr.translation.z = 1* random.randrange(-75, 75)
         tr.rotation_center.z = 0.2
@@ -58,12 +58,12 @@ def main():
 
     vao = Text.initalize_geometry()
     texture = glutils.load_texture('fontB.jpg')
-    o = Text('', np.array([-0.8, 0.3], np.float32), np.array([0.8, 0.8], np.float32), vao, 2, programGUI_id, texture)
-    viewer.add_object(o)
-    o = Text('', np.array([-0.5, -0.2], np.float32), np.array([0.5, 0.3], np.float32), vao, 2, programGUI_id, texture)
-    viewer.add_object(o)
-    o = Text('', np.array([-0.5,-1], np.float32), np.array([1.3, 0.4], np.float32), vao, 2, programGUI_id, texture)
-    viewer.add_object(o)
+   # o = Text(' bonjour', np.array([-0.8, 0.3], np.float32), np.array([0.8, 0.8], np.float32), vao, 2, programGUI_id, texture)
+    #viewer.add_object(o)
+    #o = Text(' les ', np.array([-0.5, -0.2], np.float32), np.array([0.5, 0.3], np.float32), vao, 2, programGUI_id, texture)
+    #viewer.add_object(o)
+    #o = Text(' 3ETI', np.array([-0.5,-1], np.float32), np.array([1.3, 0.4], np.float32), vao, 2, programGUI_id, texture)
+    #viewer.add_object(o)
     viewer.run()
 
 

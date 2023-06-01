@@ -48,7 +48,7 @@ class ViewerGL:
         while not glfw.window_should_close(self.window):
 
 
-            self.cam.transformation.translation = self.objs[0].transformation.translation + pyrr.Vector3([0, 1, 5])
+            
 
 
             # nettoyage de la fenêtre : fond et profondeur
@@ -154,11 +154,18 @@ class ViewerGL:
 
         if glfw.KEY_Z in self.touch and self.touch[glfw.KEY_Z] > 0:
             self.objs[0].transformation.rotation_euler[pyrr.euler.index().roll] += 0.01
+
         if glfw.KEY_S in self.touch and self.touch[glfw.KEY_S] > 0:
             self.objs[0].transformation.rotation_euler[pyrr.euler.index().roll] -= 0.01
-            
-
+          
+        if  glfw.MOUSE_BUTTON_LEFT in self.touch and self.touch[glfw.MOUSE_BUTTON_LEFT] > 0 :
+            print("tir")
 
         if glfw.KEY_SPACE in self.touch and self.touch[glfw.KEY_SPACE] > 0:
-            self.cam.transformation.rotation_center = self.objs[0].transformation.translation + self.objs[0].transformation.rotation_center
-            self.cam.transformation.translation = self.objs[0].transformation.translation + pyrr.Vector3([0, 1, 5])
+            self.cam.transformation.rotation_euler = self.objs[0].transformation.rotation_euler.copy() 
+            self.cam.transformation.rotation_euler[pyrr.euler.index().yaw] += np.pi
+            # self.cam.transformation.rotation_center = self.objs[0].transformation.translation + self.objs[0].transformation.rotation_center
+            self.cam.transformation.translation = self.objs[0].transformation.translation +\
+               pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[0].transformation.rotation_euler), pyrr.Vector3([0, 0, -5]))
+# pyrr.Vector3([0, 1, 5])
+            self.cam.transformation.rotation_center = self.cam.transformation.translation
