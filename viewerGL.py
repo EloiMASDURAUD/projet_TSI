@@ -8,6 +8,10 @@ from cpe3d import Object3D
 
 class ViewerGL:
 
+
+    cursor_x = 0
+    cursor_y = 0
+
     # Les touches quand on appui etc
     def __init__(self):
         # initialisation de la librairie GLFW
@@ -29,6 +33,11 @@ class ViewerGL:
         GL.glEnable(GL.GL_DEPTH_TEST)
         # choix de la couleur de fond
         GL.glClearColor(0.5, 0.6, 0.9, 1.0)
+
+        glfw.set_input_mode(self.window, glfw.CURSOR, glfw.CURSOR_DISABLED)
+        glfw.set_input_mode(self.window, glfw.RAW_MOUSE_MOTION, glfw.TRUE)
+        glfw.set_cursor_pos_callback(self.window, self.cursor_callback)
+
         print(f"OpenGL: {GL.glGetString(GL.GL_VERSION).decode('ascii')}")
 
         self.objs = []
@@ -37,6 +46,11 @@ class ViewerGL:
     def run(self):
         # boucle d'affichage
         while not glfw.window_should_close(self.window):
+
+
+            self.cam.transformation.translation = self.objs[0].transformation.translation + pyrr.Vector3([0, 1, 5])
+
+
             # nettoyage de la fenêtre : fond et profondeur
             GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
@@ -51,12 +65,7 @@ class ViewerGL:
                     self.update_camera(obj.program)
                 obj.draw()
 
-            self.objs[0].transformation.translation += \
-                pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[0].transformation.rotation_euler), pyrr.Vector3([0, 0, 0.05]))
-            self.cam.transformation.rotation_euler = self.objs[0].transformation.rotation_euler.copy() 
-            self.cam.transformation.rotation_euler[pyrr.euler.index().yaw] += np.pi
-            self.cam.transformation.rotation_center = self.objs[0].transformation.translation + self.objs[0].transformation.rotation_center
-            self.cam.transformation.translation = self.objs[0].transformation.translation + pyrr.Vector3([0, 1, 5])
+           
 
             # changement de buffer d'affichage pour éviter un effet de scintillement
             glfw.swap_buffers(self.window)
@@ -69,6 +78,20 @@ class ViewerGL:
             glfw.set_window_should_close(win, glfw.TRUE)
         self.touch[key] = action
     
+    def cursor_callback (self,truc,current_x,current_y) :
+        if self.cursor_x - current_x > 0 :
+            self.objs[0].transformation.rotation_euler[pyrr.euler.index().pitch] -= 0.1
+        if self.cursor_x - current_x < 0 :
+            self.objs[0].transformation.rotation_euler[pyrr.euler.index().pitch] += 0.1
+        if self.cursor_y - current_y > 0 :
+            self.objs[0].transformation.rotation_euler[pyrr.euler.index().roll] += 0.01
+        if self.cursor_y - current_y < 0 :
+            self.objs[0].transformation.rotation_euler[pyrr.euler.index().roll] -= 0.01
+        self.cursor_x = current_x
+        self.cursor_y = current_y
+        
+
+
     # Pour ajouter des objets
     def add_object(self, obj):
         self.objs.append(obj)
@@ -130,14 +153,12 @@ class ViewerGL:
             self.cam.transformation.rotation_euler[pyrr.euler.index().yaw] += 0.1
 
         if glfw.KEY_Z in self.touch and self.touch[glfw.KEY_Z] > 0:
-            self.objs.transformation.rotation_euler[pyrr.euler.index().pitch] += 0.1
+            self.objs[0].transformation.rotation_euler[pyrr.euler.index().roll] += 0.01
         if glfw.KEY_S in self.touch and self.touch[glfw.KEY_S] > 0:
-            self.objs.transformation.rotation_euler[pyrr.euler.index().pitch] -= 0.1
+            self.objs[0].transformation.rotation_euler[pyrr.euler.index().roll] -= 0.01
             
 
 
         if glfw.KEY_SPACE in self.touch and self.touch[glfw.KEY_SPACE] > 0:
-            self.cam.transformation.rotation_euler = self.objs[0].transformation.rotation_euler.copy() 
-            self.cam.transformation.rotation_euler[pyrr.euler.index().yaw] += np.pi
             self.cam.transformation.rotation_center = self.objs[0].transformation.translation + self.objs[0].transformation.rotation_center
             self.cam.transformation.translation = self.objs[0].transformation.translation + pyrr.Vector3([0, 1, 5])
