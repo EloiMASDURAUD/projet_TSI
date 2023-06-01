@@ -7,6 +7,8 @@ out vec2 vtex;
 uniform vec2 size;
 uniform vec2 start;
 
+
+
 void main (void)
 {
   //coordonnees de textures
