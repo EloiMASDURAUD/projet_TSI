@@ -1,4 +1,5 @@
-import time
+import pyrr
 
-time_seconds = time.time()
-print("The number of seconds since epoch =", time_seconds)
+X = pyrr.Vector3([0,0,1])
+Y = pyrr.Vector3([0,0,4])
+print(norm(X - Y))
