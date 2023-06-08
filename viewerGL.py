@@ -50,42 +50,42 @@ class ViewerGL:
     def run(self):
         # boucle d'affichage
 
-        
 
+        
 
         while not glfw.window_should_close(self.window):
         
+
+
+            # nettoyage de la fenêtre : fond et profondeur
+            GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+            self.update_key()
+
+            #Personnage qui avance en permanence
+            self.objs[0][1].transformation.translation += \
+                pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[0][1].transformation.rotation_euler), pyrr.Vector3([0, 0, 0.10]))
+
+            #Stégosaure copié imite le stégosaure initiale caché :
+            self.objs[1][1].transformation.translation = self.objs[0][1].transformation.translation.copy()
+
+            self.objs[1][1].transformation.rotation_euler = self.objs[0][1].transformation.rotation_euler.copy()
+            if glfw.KEY_LEFT in self.touch and self.touch[glfw.KEY_LEFT] > 0:
+                self.objs[1][1].transformation.rotation_euler[0] = self.objs[1][1].transformation.rotation_euler[2]
+
             # Caméra ten permanence derrière le personnage
             self.cam.transformation.rotation_euler = self.objs[0][1].transformation.rotation_euler.copy() 
             self.cam.transformation.rotation_euler[pyrr.euler.index().yaw] += np.pi
             self.cam.transformation.translation = self.objs[0][1].transformation.translation + pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[0][1].transformation.rotation_euler), pyrr.Vector3([0,0, -8]))
             self.cam.transformation.rotation_center = self.cam.transformation.translation
 
-            #Personnage qui avance en permanence
-            self.objs[0][1].transformation.translation += \
-                pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[0][1].transformation.rotation_euler), pyrr.Vector3([0, 0, 0.10]))
 
+    
 
-            #Personnage en position centrale:
-
-
-
-            while self.objs[0][1].transformation.rotation_euler[0] > 0:
-                self.objs[0][1].transformation.rotation_euler[0] -= 0.01
-            
-            while self.objs[0][1].transformation.rotation_euler[0] < 0:
-                self.objs[0][1].transformation.rotation_euler[0] += 0.01
-
-            # nettoyage de la fenêtre : fond et profondeur
-            GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-
-            self.update_key()
+            self.update_camera(self.objs[0][1].program)
             for item in self.objs:
                 id = item[0]
                 obj = item[1] 
                 GL.glUseProgram(obj.program)
-                if isinstance(obj, Object3D):
-                    self.update_camera(obj.program)
                 if id == "shot":   
                     obj.transformation.translation += \
                         pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(obj.transformation.rotation_euler), pyrr.Vector3([0, 0, 0.5]))                                 
@@ -160,9 +160,12 @@ class ViewerGL:
                 pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[0][1].transformation.rotation_euler), pyrr.Vector3([0, 0, 0.02]))
         if glfw.KEY_LEFT in self.touch and self.touch[glfw.KEY_LEFT] > 0:
             self.objs[0][1].transformation.rotation_euler[pyrr.euler.index().yaw] -= 0.1
-            self.objs[0][1].transformation.rotation_euler[pyrr.euler.index().pitch] -= 0.1
         if glfw.KEY_RIGHT in self.touch and self.touch[glfw.KEY_RIGHT] > 0:
             self.objs[0][1].transformation.rotation_euler[pyrr.euler.index().yaw] += 0.1
+
+            # self.objs[1][1].transformation.rotation_euler[pyrr.euler.index().yaw] = self.objs[0][1].transformation.rotation_euler[pyrr.euler.index().yaw]
+            # self.objs[1][1].transformation.translation += pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_z_rotation(np.pi/4,None),  pyrr.Vector3([0, 0, 0.02]))
+            
 
         #if glfw.KEY_I in self.touch and self.touch[glfw.KEY_I] > 0:
         #    self.cam.transformation.rotation_euler[pyrr.euler.index().roll] -= 0.1
@@ -173,23 +176,20 @@ class ViewerGL:
         #if glfw.KEY_L in self.touch and self.touch[glfw.KEY_L] > 0:
         #    self.cam.transformation.rotation_euler[pyrr.euler.index().yaw] += 0.1
             
-        if glfw.MOUSE_BUTTON_LEFT in self.touch and self.touch[glfw.MOUSE_BUTTON_LEFT] > 0:
-            #tr = Transformation3D()
-            #tr.translation.y = -np.amin(self.m.vertices, axis=0)[1]
-            #tr.translation.z = -5
-            #tr.rotation_center.z = 0.2
-            if time.time()-self.last_shot_time > 1 :
-                tr =  Transformation3D(self.objs[0][1].transformation.rotation_euler, self.objs[0][1].transformation.rotation_center, self.objs[0][1].transformation.translation)
-                texture = glutils.load_texture('stegosaurus.jpg')
-                o = Object3D(self.m.load_to_gpu(), self.m.get_nb_triangles(), self.program3d_id, texture, tr)
-                self.add_object(("shot",o))    
-                self.last_shot_time = time.time()
+#         if glfw.MOUSE_BUTTON_LEFT in self.touch and self.touch[glfw.MOUSE_BUTTON_LEFT] > 0:
+           
+#             if time.time()-self.last_shot_time > 1 :
+#                 tr =  Transformation3D(self.objs[0][1].transformation.rotation_euler, self.objs[0][1].transformation.rotation_center, self.objs[0][1].transformation.translation)
+#                 texture = glutils.load_texture('stegosaurus.jpg')
+#                 o = Object3D(self.m.load_to_gpu(), self.m.get_nb_triangles(), self.program3d_id, texture, tr)
+#                 self.add_object(("shot",o))    
+#                 self.last_shot_time = time.time()
 
-        if glfw.KEY_SPACE in self.touch and self.touch[glfw.KEY_SPACE] > 0:
-            self.cam.transformation.rotation_euler = self.objs[0][1].transformation.rotation_euler.copy() 
-            self.cam.transformation.rotation_euler[pyrr.euler.index().yaw] += np.pi
-            #self.cam.transformation.rotation_center = self.objs[0][1].transformation.translation + self.objs[0][1].transformation.rotation_center
-            self.cam.transformation.translation = self.objs[0][1].transformation.translation +\
-               pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[0][1].transformation.rotation_euler), pyrr.Vector3([0,0, -8]))
-# pyrr.Vector3([0, 1, 5])
-            self.cam.transformation.rotation_center = self.cam.transformation.translation
+#         if glfw.KEY_SPACE in self.touch and self.touch[glfw.KEY_SPACE] > 0:
+#             self.cam.transformation.rotation_euler = self.objs[0][1].transformation.rotation_euler.copy() 
+#             self.cam.transformation.rotation_euler[pyrr.euler.index().yaw] += np.pi
+#             #self.cam.transformation.rotation_center = self.objs[0][1].transformation.translation + self.objs[0][1].transformation.rotation_center
+#             self.cam.transformation.translation = self.objs[0][1].transformation.translation +\
+#                pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[0][1].transformation.rotation_euler), pyrr.Vector3([0,0, -8]))
+# # pyrr.Vector3([0, 1, 5])
+#             self.cam.transformation.rotation_center = self.cam.transformation.translation

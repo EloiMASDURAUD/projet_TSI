@@ -23,18 +23,24 @@ def main():
     m.normalize()
     m.apply_matrix(pyrr.matrix44.create_from_scale([2, 2, 2, 1]))
     tr = Transformation3D()
+    vao = m.load_to_gpu()
     #tr.translation.y = -np.amin(m.vertices, axis=0)[1]
     tr.translation.y = Hauteur
-    tr.translation.z = 2
     texture = glutils.load_texture('stegosaurus.jpg')
-    o = Object3D(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, tr)
-    
-    
+    texturejaune = glutils.load_texture('jaune.jpg')
+    o = Object3D(vao, m.get_nb_triangles(), program3d_id, texturejaune, tr)
+    # o.visible = False
     viewer.add_object(("p",o))
     viewer.transfer(program3d_id, programGUI_id, m)
 
 
-    m = Mesh.load_obj('stegosaurus2.obj')
+    new_tr= Transformation3D()
+    new_tr.translation.y = Hauteur 
+    o = Object3D(vao, m.get_nb_triangles(), program3d_id, texture, new_tr)
+    viewer.add_object(("p",o))
+    viewer.transfer(program3d_id, programGUI_id, m)
+
+    m = Mesh.load_obj('anneau.obj')
     m.normalize()
     m.apply_matrix(pyrr.matrix44.create_from_scale([2, 2, 2, 1]))
     for i in range (50):
