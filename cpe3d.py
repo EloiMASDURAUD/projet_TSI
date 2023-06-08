@@ -57,6 +57,42 @@ class Object3D(Object):
 
         super().draw()
 
+
+class anneau(Object3D):
+    def __init__(self, vao, nb_triangle, program, texture, transformation,hp):
+        super().__init__(vao, nb_triangle, program, texture,transformation)
+        self.hp = hp
+
+    def draw(self):
+        GL.glUseProgram(self.program)
+
+        # Récupère l'identifiant de la variable pour le programme courant
+        loc = GL.glGetUniformLocation(self.program, "translation_model")
+        # Vérifie que la variable existe
+        if (loc == -1) :
+            print("Pas de variable uniforme : translation_model")
+        # Modifie la variable pour le programme courant
+        translation = self.transformation.translation
+        GL.glUniform4f(loc, translation.x, translation.y, translation.z, 0)
+
+        # Récupère l'identifiant de la variable pour le programme courant
+        loc = GL.glGetUniformLocation(self.program, "rotation_center_model")
+        # Vérifie que la variable existe
+        if (loc == -1) :
+            print("Pas de variable uniforme : rotation_center_model")
+        # Modifie la variable pour le programme courant
+        rotation_center = self.transformation.rotation_center
+        GL.glUniform4f(loc, rotation_center.x, rotation_center.y, rotation_center.z, 0)
+
+        rot = pyrr.matrix44.create_from_eulers(self.transformation.rotation_euler)
+        loc = GL.glGetUniformLocation(self.program, "rotation_model")
+        if (loc == -1) :
+            print("Pas de variable uniforme : rotation_model")
+        GL.glUniformMatrix4fv(loc, 1, GL.GL_FALSE, rot)
+
+        super().draw()
+
+
 class Camera:
     def __init__(self, transformation = Transformation3D(translation=pyrr.Vector3([0, 1, 0], dtype='float32')), projection = pyrr.matrix44.create_perspective_projection(60, 1, 0.01, 100)):
         self.transformation = transformation
