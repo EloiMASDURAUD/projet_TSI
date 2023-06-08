@@ -88,7 +88,32 @@ class ViewerGL:
                 GL.glUseProgram(obj.program)
                 if id == "shot":   
                     obj.transformation.translation += \
-                        pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(obj.transformation.rotation_euler), pyrr.Vector3([0, 0, 0.5]))                                 
+                        pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(obj.transformation.rotation_euler), pyrr.Vector3([0, 0, 0.5]))            
+                if id == "anneau" :
+                    distance = 0
+                    for i in range (3):
+                        distance += (obj.transformation.translation[i] - self.objs[0][1].transformation.translation[i])**2
+                    if distance < 1 :
+                        print ("aaaaa")
+                        obj.visible = False
+                        self.objs.remove(item)
+                        
+                if id == "shot" :
+                    for item2 in self.objs:
+                        if item2[0] == "cube" :
+                            distance = 0
+                            for i in range (3):
+                                distance += (obj.transformation.translation[i] - item2[1].transformation.translation[i])**2
+                            if distance < 1 :
+                                print ("aaaaa")
+                                obj.visible = False
+                                item2[1].visible = False
+                                self.objs.remove(item2)
+                                self.objs.remove(item)
+                                
+                        
+                        
+                                        
                 obj.draw()
             
 
@@ -161,7 +186,7 @@ class ViewerGL:
         if glfw.KEY_LEFT in self.touch and self.touch[glfw.KEY_LEFT] > 0:
             self.objs[0][1].transformation.rotation_euler[pyrr.euler.index().yaw] -= 0.1
         if glfw.KEY_RIGHT in self.touch and self.touch[glfw.KEY_RIGHT] > 0:
-            self.objs[0][1].transformation.rotation_euler[pyrr.euler.index().yaw] += 0.1
+            self.objs[0][1].transformation.rotation_euler[pyrr.euler.index().yaw] += 0.01
 
             # self.objs[1][1].transformation.rotation_euler[pyrr.euler.index().yaw] = self.objs[0][1].transformation.rotation_euler[pyrr.euler.index().yaw]
             # self.objs[1][1].transformation.translation += pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_z_rotation(np.pi/4,None),  pyrr.Vector3([0, 0, 0.02]))
