@@ -20,11 +20,8 @@ out vec3 coordonnee_3d_locale;
 out vec3 vnormale;
 out vec4 vcolor;
 out vec2 vtex;
-<<<<<<< HEAD
 
 
-=======
->>>>>>> 940178d9979bb835bdb8cc80b7c92129c804c475
 
 //Un Vertex Shader minimaliste
 void main (void)
